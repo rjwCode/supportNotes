@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Support Notes</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+    <body id="htmlBody">
+        <div class="noteSpace">
+            <div class="newNoteContainer">
+                <button class="newNoteButton" onclick="createNewNoteElement()">
+                    <img class="newNoteButtonImage" src="addNote.svg" alt="Add note">
+                </button>
+            </div>
+            <!-- <div class="mydiv">
+                <div class="mydivheader">
+                    <button class="deleteNoteButton">X</button>
+                    <button class="saveNoteButton">Save</button>
+                </div>
+                <textarea class="noteText"></textarea>
+            </div> -->
+            <button class="supportNotesViewButton">
+                <p class="viewButtonTextBeforeHover"></p>
+                <p class="viewButtonTextOnHover">View Support Notes</p>
+            </button>
+        </div>
+
+        <div class="overlay"></div>
+        <div class="supportNotesModal">
+            <div class="notesModalHeader">
+                <div class="modalTitle">
+                    Saved Support Notes
+                </div>
+                <button class="closeNotesModal">X</button>
+            </div>
+            <div class="notesSection">      
+            </div>
+        </div>
+        <script id="myscript" type="text/javascript" src="notesPage.js"></script>
+    </body>
+</html>
