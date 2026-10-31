@@ -24,17 +24,30 @@ export async function getSavedNote(id){
     return rows[0];
 }
 
-export async function createSavedNote(contents){
+export async function deleteSavedNote(id){
     const [result] = await pool.query(`
-        INSERT INTO saved_support_notes (contents) 
-        VALUES (?)
-        `, contents);
+        DELETE
+        FROM saved_support_notes
+        WHERE id = ?
+    `, [id]);
+    return result.affectedRows;
+}
+
+export async function updateSavedNote(id, newTextContent){
+    const [result] = await pool.query(`
+        UPDATE saved_support_notes
+        SET contents = ?
+        WHERE id = ?
+    `, [newTextContent, id]);
+    return result.affectedRows;
+}
+
+export async function createSavedNote(contents, user_uuid){
+    const [result] = await pool.query(`
+        INSERT INTO saved_support_notes (contents, user_uuid) 
+        VALUES (?, ?)
+        `, [contents, user_uuid]);
     
     const id = result.insertId;
     return getSavedNote(id);
 }
-
-// const result = await createSavedNote('Test adding note 3');
-// console.log(result);
-
-// console.log(await getSavedNote(1));

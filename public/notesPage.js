@@ -1,3 +1,4 @@
+initUser();
 let savedNotes = [];
 //let currentNotes = [];
 let nextNoteId;
@@ -13,7 +14,7 @@ if(!localStorage.getItem('nextNoteId')){
 if(!localStorage.getItem('notes')){
     localStorage.setItem('notes', JSON.stringify([]));
 } else{
-    //currentNotes = await JSON.parse(localStorage.getItem('notes'));
+    //currentNotes = JSON.parse(localStorage.getItem('notes'));
     let localNotes = JSON.parse(localStorage.getItem('notes'));
     localNotes.forEach((note) => {
         displayExistingNote(note);
@@ -36,18 +37,6 @@ outerDivArray.forEach((element) => dragElement(element));
 
 let newNoteButton = document.querySelector('.newNoteButtonImage');
 
-//This was causing there to be duplicate event listeners on the note buttons
-// outerDivArray.forEach((element) => {
-//     let deleteButton = element.querySelector('.deleteNoteButton');
-//     let saveButton = element.querySelector('.saveNoteButton');
-//     deleteButton.addEventListener('click', () => {
-//         deleteNote(deleteButton);
-//     });
-//     saveButton.addEventListener('click', () => {
-//         saveNote(saveButton);
-//     });
-// });
-
 function closeNotesModal(){
     let notesModal = document.querySelector('.supportNotesModal');
     notesModal.style.display = "none";
@@ -66,18 +55,75 @@ async function viewNotes(){
     });
     const resultJson = await getNotesResult.json();
     const resultArray = Array.from(resultJson);
+    let notesSection = document.querySelector('.notesSection');
+    notesSection.innerHTML = '';
+
     resultArray.forEach((note) => {
         // TO-DO: look into session / session id (view 4 in TO-DO section)
-        // if (session = user's session){
-        //     create note with close button instead
-        //     add event listener to button
-        //     create delete function somewhere else in this file
-        // }
-        let notesSection = document.querySelector('.notesSection');
-        let noteDiv = document.createElement("div");
-        noteDiv.textContent = note.contents;
-        noteDiv.style = "overflow-y: scroll; border: 3px solid black; word-wrap: break-word; margin-top: 15px; margin-left: 38px; margin-right: 20px; padding-top: 15px; padding-bottom: 15px; text-align: center; font-size: x-large; width: 250px; height: 250px; background-color: teal; color: black;";
-        notesSection.appendChild(noteDiv);
+        if (note.isOwner == true){
+            let noteDiv = document.createElement("div");
+            noteDiv.id = note.id;
+            noteDiv.style = "border: 3px solid black; overflow-wrap: break-word; margin-top: 15px; margin-left: 38px; margin-right: 20px; text-align: center; font-size: x-large; width: 250px; height: 280px; background-color: teal; color: black;";
+            
+            let buttonDiv = document.createElement("div");
+            buttonDiv.style = "position: relative; top: 0; left: 0; width: 100%; height: 40px; margin-left: 0px; background-color: tan; align-content: center; border-bottom: 3px solid black;";
+            noteDiv.appendChild(buttonDiv);
+
+            let sharedUpdateButton = document.createElement("button");
+            sharedUpdateButton.style = "top: 0; left: 0; width: 65px; height: 25px; margin-left: 140px; font-size: large;";
+            sharedUpdateButton.textContent = "Edit";
+            sharedUpdateButton.addEventListener('click', async () => {
+                let savedNoteParagraph = sharedUpdateButton.parentElement.parentElement.querySelector('.savedNoteParagraph');
+                if(sharedUpdateButton.textContent === "Edit"){
+                    savedNoteParagraph.contentEditable = "true";
+                    sharedUpdateButton.textContent = "Update";
+                } else if(sharedUpdateButton.textContent === "Update"){
+                    console.log("FETCH");
+                    const response = await fetch(`/updateSavedNote/${noteDiv.id}`, {
+                        method: "PUT",
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({newContent: savedNoteParagraph.textContent})
+                    });
+                    if(response.ok){
+                        console.log("sent update");
+                        savedNoteParagraph.contentEditable = "false";
+                        sharedUpdateButton.textContent = "Edit";
+                    } else{
+                        alert("Failed to update note!");
+                    }
+
+                }
+            })
+
+            let sharedDeleteButton = document.createElement("button");
+            sharedDeleteButton.style = "top: 0; left: 0; width: 25px; height: 25px; margin-left: 10px; font-size: large;";
+            sharedDeleteButton.textContent = "X";
+            sharedDeleteButton.addEventListener('click', () => {
+                deleteSharedNote(sharedDeleteButton);
+            })
+            buttonDiv.appendChild(sharedUpdateButton);
+            buttonDiv.appendChild(sharedDeleteButton);
+            
+            
+            let paragraphDiv = document.createElement("div");
+            paragraphDiv.style = "overflow-y: scroll; width: 250px; height: 240px;";
+            let sharedNoteParagraph = document.createElement("p");
+            sharedNoteParagraph.style = "overflow-wrap: break-word; overflow-y: scroll; overflow-wrap: break-word; text-align: center; margin: 0px; padding-left: 10px; padding-right: 10px; padding-top: 10px; top: 10;";
+            sharedNoteParagraph.textContent = note.contents;
+            sharedNoteParagraph.className = "savedNoteParagraph";
+            paragraphDiv.appendChild(sharedNoteParagraph);
+
+            noteDiv.appendChild(paragraphDiv);
+
+            notesSection.appendChild(noteDiv);
+        }
+        else{
+            let notesSection = document.querySelector('.notesSection');
+            let noteDiv = document.createElement("div");
+            noteDiv.textContent = note.contents;
+            noteDiv.style = "overflow-y: scroll; border: 3px solid black; word-wrap: break-word; margin-top: 15px; margin-left: 38px; margin-right: 20px; padding-top: 15px; padding-bottom: 15px; text-align: center; font-size: x-large; width: 250px; height: 250px; background-color: teal; color: black;";
+            notesSection.appendChild(noteDiv);
+        }
     })
 
     let supportNotesModal = document.querySelector('.supportNotesModal');
@@ -94,7 +140,7 @@ async function deleteNote(element){
     let noteDivElement = element.parentElement.parentElement;
     let noteToDeleteId = noteDivElement.id;
 
-    const storedNotes = await JSON.parse(localStorage.getItem('notes'));
+    const storedNotes = JSON.parse(localStorage.getItem('notes'));
     let filteredNotes = storedNotes.filter((note) => note.id != noteToDeleteId);
     localStorage.setItem('notes', JSON.stringify(filteredNotes));
 
@@ -160,7 +206,7 @@ function dragElement(element) {
         console.log("TOP " + element.style.top);
         console.log("LEFT " + element.style.left);
         
-        let localNotes = await JSON.parse(localStorage.getItem('notes'));
+        let localNotes = JSON.parse(localStorage.getItem('notes'));
         let filtered = localNotes.filter((note) => note.id == element.id);
         filtered[0].posx = element.style.left;
         filtered[0].posy = element.style.top;
@@ -305,8 +351,9 @@ async function addTextAreaListener(element){
     console.log("Made it to text area function");
     let textArea = element.querySelector('.noteText');
     textArea.addEventListener('input', async () => {
-        let localNotes = await JSON.parse(localStorage.getItem('notes'));
+        let localNotes = JSON.parse(localStorage.getItem('notes')) || [];
         let filtered = localNotes.filter((note) => note.id == element.id);
+
         filtered[0].content = textArea.value;
         localStorage.setItem('notes', JSON.stringify(localNotes));
     });
@@ -318,12 +365,32 @@ async function addResizeObserver(element){
         let entry = entries[0];
         const cr = entry.contentRect;
 
-        let localNotes = await JSON.parse(localStorage.getItem('notes'));
+        let localNotes = JSON.parse(localStorage.getItem('notes')) || [];
         let filtered = localNotes.filter((note) => note.id == element.id);
-        filtered[0].textAreaHeight = cr.height + "px";
-        filtered[0].textAreaWidth = cr.width + "px";
+
+        if(filtered[0]){
+            filtered[0].textAreaHeight = cr.height + "px";
+            filtered[0].textAreaWidth = cr.width + "px";
+        }
         localStorage.setItem('notes', JSON.stringify(localNotes));
     });
     ro.observe(textArea);
 }
-// TO-DO: Implement HttpOnly cookie for delete and update functions for shared notes (4)
+
+async function initUser(){
+    await fetch('http://localhost:8080/api/init_user');
+}
+
+async function deleteSharedNote(element){
+    const sharedNote = element.parentElement.parentElement;
+    const id = sharedNote.id;
+    console.log("FRONT END SHARED NOTE ID: "+id);
+    const response = await fetch(`http://localhost:8080/deleteSavedNote/${id}`, {
+        method: 'DELETE'
+    });
+    
+    const notesSection = document.querySelector('.notesSection');
+    if(response.ok){
+        notesSection.removeChild(sharedNote);
+    }
+}
