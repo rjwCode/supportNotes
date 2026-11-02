@@ -1,7 +1,7 @@
 initUser();
 let savedNotes = [];
-//let currentNotes = [];
 let nextNoteId;
+let noteCounter;
 
 if(!localStorage.getItem('nextNoteId')){
     console.log("couldn't find next id");
@@ -14,12 +14,20 @@ if(!localStorage.getItem('nextNoteId')){
 if(!localStorage.getItem('notes')){
     localStorage.setItem('notes', JSON.stringify([]));
 } else{
-    //currentNotes = JSON.parse(localStorage.getItem('notes'));
     let localNotes = JSON.parse(localStorage.getItem('notes'));
     localNotes.forEach((note) => {
         displayExistingNote(note);
     })
 }
+
+if(!localStorage.getItem('noteCount')){
+    localStorage.setItem('noteCount', 0);
+    noteCounter = 0;
+} else{
+    noteCounter = localStorage.getItem('noteCount');
+}
+
+checkForNoNotes();
 
 let viewNotesButton = document.querySelector('.supportNotesViewButton');
 viewNotesButton.addEventListener('click', () => {
@@ -59,7 +67,6 @@ async function viewNotes(){
     notesSection.innerHTML = '';
 
     resultArray.forEach((note) => {
-        // TO-DO: look into session / session id (view 4 in TO-DO section)
         if (note.isOwner == true){
             let noteDiv = document.createElement("div");
             noteDiv.id = note.id;
@@ -143,8 +150,11 @@ async function deleteNote(element){
     const storedNotes = JSON.parse(localStorage.getItem('notes'));
     let filteredNotes = storedNotes.filter((note) => note.id != noteToDeleteId);
     localStorage.setItem('notes', JSON.stringify(filteredNotes));
+    noteCounter--;
+    localStorage.setItem('noteCount', noteCounter);
 
     noteDivElement.remove();
+    checkForNoNotes();
 }
 
 async function saveNote(element){
@@ -166,7 +176,6 @@ async function saveNote(element){
 }
 
 function dragElement(element) {
-    console.log("I ran");
     let pos1 = 0;
     let pos2 = 0;
     let pos3 = 0;
@@ -193,13 +202,29 @@ function dragElement(element) {
         e = e || window.event;
         e.preventDefault();
 
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
+        let deltaX = pos3 - e.clientX;
+        let deltaY = pos4 - e.clientY;
 
-        element.style.top = (element.offsetTop - pos2) + "px";
-        element.style.left = (element.offsetLeft - pos1) + "px";
+        let oldLeft = element.offsetLeft;
+        let oldTop = element.offsetTop;
+        
+        let minX = 0;
+        let minY = 0;
+        let maxX = document.documentElement.clientWidth - element.offsetWidth;
+        let maxY = document.documentElement.clientHeight - element.offsetHeight;
+
+        let newTop = Math.max(minY, Math.min(oldTop - deltaY, maxY));
+        let newLeft = Math.max(minX, Math.min(oldLeft - deltaX, maxX));
+
+        element.style.left = newLeft + "px";
+        element.style.top = newTop + "px";
+
+        if(oldLeft !== newLeft){
+            pos3 = e.clientX;
+        }
+        if(oldTop !== newTop){
+            pos4 = e.clientY;
+        }
     }
 
     async function closeDragElement(){
@@ -281,10 +306,14 @@ function createNewNoteElement(){
     nextNoteId++;
     localStorage.setItem('nextNoteId', nextNoteId);
 
+    noteCounter++;
+    localStorage.setItem('noteCount', noteCounter);
+
     script_parent.insertBefore(noteHeader, script);
     addTextAreaListener(noteHeader);
     addResizeObserver(noteHeader);
     dragElement(noteHeader);
+    checkForNoNotes();
 }
 
 function displayExistingNote(note){
@@ -364,6 +393,15 @@ async function addResizeObserver(element){
     var ro = new ResizeObserver(async entries => {
         let entry = entries[0];
         const cr = entry.contentRect;
+        let maxWidth = window.innerWidth - cr.left;
+        let maxHeight = window.innerHeight - cr.top;
+
+        if(cr.width > maxWidth){
+            element.style.width = `${maxWidth}px`;
+        }
+        if(cr.height > maxHeight){
+            element.style.height = `${maxHeight}px`;
+        }
 
         let localNotes = JSON.parse(localStorage.getItem('notes')) || [];
         let filtered = localNotes.filter((note) => note.id == element.id);
@@ -392,5 +430,20 @@ async function deleteSharedNote(element){
     const notesSection = document.querySelector('.notesSection');
     if(response.ok){
         notesSection.removeChild(sharedNote);
+    }
+}
+
+function checkForNoNotes(){
+    console.log("At note check"
+    );
+    let noNotesGraphic = document.querySelector('.noNotesGraphic');
+    console.log(typeof(localStorage.getItem('noteCount')));
+    console.log("Notecount: " + localStorage.getItem('noteCount'))
+    if(Number(localStorage.getItem('noteCount')) !== 0){
+        console.log("Set as none");
+        noNotesGraphic.style.display = "none";
+    }else{
+        console.log("Set as flex");
+        noNotesGraphic.style.display = "flex";
     }
 }

@@ -25,12 +25,6 @@
 
 body{
     background-color: teal;
-    /* Below is for adding GIF as background */
-    /* background-image: url();
-    background-size: auto;
-    background-repeat: no-repeat;
-    background-position-x: 100%;
-    background-position-y: 0%; */
 }
 
 .noteText{
@@ -49,6 +43,7 @@ body{
     position: fixed;
     top: 0px;
     left: 0px;
+    z-index: 2000;
 }
 
 .newNoteButton{
@@ -207,7 +202,7 @@ body{
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background-color: tan;
+    background-color: #d2b48c;
     font-size: large;
     border-color: black;
     color: black;
@@ -232,4 +227,38 @@ body{
 textarea:focus{
     outline: none;
     border-color: silver;
+}
+
+.noNotesGraphic{
+    display:none;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+    background-color: teal;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.notebookImage{
+    animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+    0%{
+        transform: rotate(0deg);
+        scale: 1;
+    }
+    3%{
+        scale: 3;
+    }
+    6%{
+        transform: rotate(720deg);
+        scale: 1;
+    }
+    100%{
+        transform: rotate(720deg);
+        scale: 1;
+    }
 }
