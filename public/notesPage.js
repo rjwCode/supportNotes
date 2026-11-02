@@ -4,7 +4,6 @@ let nextNoteId;
 let noteCounter;
 
 if(!localStorage.getItem('nextNoteId')){
-    console.log("couldn't find next id");
     localStorage.setItem('nextNoteId', 0);
     nextNoteId = 0;
 }else{
@@ -36,7 +35,6 @@ viewNotesButton.addEventListener('click', () => {
 
 let closeNotesModalButton = document.querySelector('.closeNotesModal');
 closeNotesModalButton.addEventListener('click', () => {
-    console.log("CLOSED");
     closeNotesModal();
 });
 
@@ -57,7 +55,6 @@ function closeNotesModal(){
 }
 
 async function viewNotes(){
-    console.log("hi");
     const getNotesResult = await fetch('http://localhost:8080/savedNotes', {
         method: "GET"
     });
@@ -85,14 +82,12 @@ async function viewNotes(){
                     savedNoteParagraph.contentEditable = "true";
                     sharedUpdateButton.textContent = "Update";
                 } else if(sharedUpdateButton.textContent === "Update"){
-                    console.log("FETCH");
                     const response = await fetch(`/updateSavedNote/${noteDiv.id}`, {
                         method: "PUT",
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({newContent: savedNoteParagraph.textContent})
                     });
                     if(response.ok){
-                        console.log("sent update");
                         savedNoteParagraph.contentEditable = "false";
                         sharedUpdateButton.textContent = "Edit";
                     } else{
@@ -159,9 +154,7 @@ async function deleteNote(element){
 
 async function saveNote(element){
     let noteOuterDiv = element.parentElement.parentElement;
-    console.log(noteOuterDiv);
     let noteText = noteOuterDiv.querySelector('.noteText').value;
-    console.log("NOTE TEXT: " + noteText);
     savedNotes.push(noteText);
     
     await fetch('http://localhost:8080/savedNotes', {
@@ -228,9 +221,6 @@ function dragElement(element) {
     }
 
     async function closeDragElement(){
-        console.log("TOP " + element.style.top);
-        console.log("LEFT " + element.style.left);
-        
         let localNotes = JSON.parse(localStorage.getItem('notes'));
         let filtered = localNotes.filter((note) => note.id == element.id);
         filtered[0].posx = element.style.left;
@@ -323,8 +313,6 @@ function displayExistingNote(note){
     let content = note.content;
     let textAreaWidth = note.textAreaWidth;
     let textAreaHeight = note.textAreaHeight;
-    console.log("Height " + textAreaHeight);
-    console.log("Width " + textAreaWidth);
 
     const script = document.getElementById("myscript");
     const script_parent = script.parentElement;
@@ -377,7 +365,6 @@ function displayExistingNote(note){
 }
 
 async function addTextAreaListener(element){
-    console.log("Made it to text area function");
     let textArea = element.querySelector('.noteText');
     textArea.addEventListener('input', async () => {
         let localNotes = JSON.parse(localStorage.getItem('notes')) || [];
@@ -422,7 +409,6 @@ async function initUser(){
 async function deleteSharedNote(element){
     const sharedNote = element.parentElement.parentElement;
     const id = sharedNote.id;
-    console.log("FRONT END SHARED NOTE ID: "+id);
     const response = await fetch(`http://localhost:8080/deleteSavedNote/${id}`, {
         method: 'DELETE'
     });
@@ -434,16 +420,10 @@ async function deleteSharedNote(element){
 }
 
 function checkForNoNotes(){
-    console.log("At note check"
-    );
     let noNotesGraphic = document.querySelector('.noNotesGraphic');
-    console.log(typeof(localStorage.getItem('noteCount')));
-    console.log("Notecount: " + localStorage.getItem('noteCount'))
     if(Number(localStorage.getItem('noteCount')) !== 0){
-        console.log("Set as none");
         noNotesGraphic.style.display = "none";
     }else{
-        console.log("Set as flex");
         noNotesGraphic.style.display = "flex";
     }
 }
