@@ -4,5 +4,9 @@ services:
       context: .
     ports:
       - 8080:8080
-    env_file:
-      - .env
+    environment:
+      - MYSQL_HOST=${{MYSQL_HOST}}
+      - MYSQL_USER=${{MYSQL_USER}}
+      - MYSQL_PASSWORD=${{MYSQL_PASSWORD}}
+      - MYSQL_DATABASE=${{MYSQL_DATABASE}}
+      - MYSQL_PORT=${{MYSQL_PORT}}
