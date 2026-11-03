@@ -3,13 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log("DATABASE CONFIG DETECTED:", {
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    database: process.env.MYSQL_DATABASE,
-    port: Number(process.env.MYSQL_PORT)
-});
-
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
