@@ -5,7 +5,7 @@ import serveFavicon from 'serve-favicon';
 import { getSavedNote, getSavedNotes, createSavedNote, deleteSavedNote, updateSavedNote } from './database.js';
 
 const app = express();
-const port = 8080;
+const port = process.env.port || 8080;
 
 app.use(express.json());
 app.use(cookieParser());
