@@ -1,4 +1,7 @@
-initUser();
+(async () => {
+    await initUser();
+})();
+
 let savedNotes = [];
 let nextNoteId;
 let noteCounter;
@@ -55,7 +58,7 @@ function closeNotesModal(){
 }
 
 async function viewNotes(){
-    const getNotesResult = await fetch('http://localhost:8080/savedNotes', {
+    const getNotesResult = await fetch('/savedNotes', {
         method: "GET"
     });
     const resultJson = await getNotesResult.json();
@@ -157,7 +160,7 @@ async function saveNote(element){
     let noteText = noteOuterDiv.querySelector('.noteText').value;
     savedNotes.push(noteText);
     
-    await fetch('http://localhost:8080/savedNotes', {
+    await fetch('/savedNotes', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
@@ -403,13 +406,13 @@ async function addResizeObserver(element){
 }
 
 async function initUser(){
-    await fetch('http://localhost:8080/api/init_user');
+    await fetch('/api/init_user');
 }
 
 async function deleteSharedNote(element){
     const sharedNote = element.parentElement.parentElement;
     const id = sharedNote.id;
-    const response = await fetch(`http://localhost:8080/deleteSavedNote/${id}`, {
+    const response = await fetch(`/deleteSavedNote/${id}`, {
         method: 'DELETE'
     });
     
