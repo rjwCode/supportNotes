@@ -160,7 +160,7 @@ body{
     inset: 50px;
     max-width: 100vw;
     max-height: 100dvh;
-    width: 60rem;
+    width: auto;
     height: 40rem;
     margin: auto;
     z-index: 2000;
@@ -216,7 +216,7 @@ body{
 
 .notesSection{
     display: flex;
-    width: 960px;
+    width: auto;
     height: 575px;
     overflow-y: scroll;
     flex-wrap: wrap;
