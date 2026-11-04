@@ -70,7 +70,7 @@ async function viewNotes(){
         if (note.isOwner == true){
             let noteDiv = document.createElement("div");
             noteDiv.id = note.id;
-            noteDiv.style = "overflow-y: scroll; border: 3px solid black; overflow-wrap: break-word; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 10px; padding-left: auto; padding-right: auto; padding-top: 10px; padding-bottom: 10px; text-align: center; font-size: x-large; width: 250px; height: 250px; background-color: teal; color: black";
+            noteDiv.style = "overflow-y: scroll; border: 3px solid black; overflow-wrap: break-word; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 10px; padding-left: auto; padding-right: auto; padding-top: 0px; padding-bottom: 10px; text-align: center; font-size: x-large; width: 250px; height: 250px; background-color: teal; color: black";
             
             let buttonDiv = document.createElement("div");
             buttonDiv.style = "position: relative; top: 0; left: 0; width: 100%; height: 40px; margin-left: 0px; background-color: tan; align-content: center; border-bottom: 3px solid black;";
